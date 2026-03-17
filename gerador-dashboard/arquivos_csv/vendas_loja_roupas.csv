@@ -1,0 +1,121 @@
+data,produto,categoria,quantidade,preco_unitario,cidade,valor_total
+2025-02-08,Vestido,Infantil,9,154.86,Curitiba,1393.7400000000002
+2025-01-29,Calça,Masculino,6,166.49,Curitiba,998.94
+2025-01-15,Camiseta,Masculino,7,77.85,São Paulo,544.9499999999999
+2025-02-12,Short,Feminino,7,60.06,São Paulo,420.42
+2025-01-08,Jaqueta,Infantil,3,157.5,Rio de Janeiro,472.5
+2025-01-21,Vestido,Infantil,2,167.06,Belo Horizonte,334.12
+2025-02-08,Jaqueta,Feminino,9,198.29,São Paulo,1784.61
+2025-01-19,Jaqueta,Feminino,8,100.05,Rio de Janeiro,800.4
+2025-01-23,Camiseta,Infantil,7,93.14,Rio de Janeiro,651.98
+2025-01-11,Jaqueta,Infantil,9,161.89,Belo Horizonte,1457.0099999999998
+2025-01-11,Short,Feminino,4,87.84,Curitiba,351.36
+2025-01-24,Jaqueta,Masculino,4,188.13,São Paulo,752.52
+2025-02-05,Camiseta,Masculino,1,175.83,Belo Horizonte,175.83
+2025-02-09,Short,Feminino,8,102.83,São Paulo,822.64
+2025-01-24,Calça,Masculino,3,157.55,Rio de Janeiro,472.65000000000003
+2025-01-03,Jaqueta,Feminino,7,158.17,Rio de Janeiro,1107.1899999999998
+2025-01-22,Camiseta,Masculino,2,47.43,Curitiba,94.86
+2025-01-02,Calça,Masculino,2,183.33,Rio de Janeiro,366.66
+2025-01-24,Calça,Infantil,7,115.79,Rio de Janeiro,810.5300000000001
+2025-02-13,Vestido,Infantil,6,170.4,Belo Horizonte,1022.4000000000001
+2025-01-30,Short,Masculino,3,84.31,São Paulo,252.93
+2025-02-07,Jaqueta,Masculino,9,182.14,São Paulo,1639.2599999999998
+2025-01-02,Camiseta,Infantil,6,96.06,Belo Horizonte,576.36
+2025-01-21,Vestido,Infantil,6,31.74,Curitiba,190.44
+2025-02-02,Short,Infantil,1,183.81,São Paulo,183.81
+2025-01-12,Vestido,Feminino,4,45.42,Rio de Janeiro,181.68
+2025-01-22,Short,Masculino,6,84.18,São Paulo,505.08000000000004
+2025-02-13,Short,Infantil,6,191.41,Rio de Janeiro,1148.46
+2025-01-25,Jaqueta,Masculino,5,191.5,Curitiba,957.5
+2025-02-18,Short,Feminino,1,127.38,Belo Horizonte,127.38
+2025-01-27,Vestido,Feminino,8,137.31,São Paulo,1098.48
+2025-02-11,Short,Infantil,5,106.14,Belo Horizonte,530.7
+2025-01-28,Jaqueta,Feminino,5,79.75,São Paulo,398.75
+2025-01-16,Jaqueta,Masculino,7,85.77,Rio de Janeiro,600.39
+2025-01-15,Vestido,Infantil,4,144.23,Belo Horizonte,576.92
+2025-02-16,Calça,Masculino,6,157.8,São Paulo,946.8000000000001
+2025-02-13,Calça,Masculino,4,164.47,Rio de Janeiro,657.88
+2025-01-03,Short,Feminino,3,164.14,Belo Horizonte,492.41999999999996
+2025-02-06,Camiseta,Feminino,7,45.41,Belo Horizonte,317.87
+2025-01-07,Short,Feminino,8,113.95,São Paulo,911.6
+2025-01-21,Vestido,Feminino,4,39.68,São Paulo,158.72
+2025-01-09,Vestido,Feminino,2,123.32,São Paulo,246.64
+2025-02-08,Vestido,Infantil,3,104.96,Rio de Janeiro,314.88
+2025-01-18,Vestido,Masculino,1,180.81,São Paulo,180.81
+2025-01-04,Vestido,Masculino,8,89.56,Belo Horizonte,716.48
+2025-01-25,Jaqueta,Masculino,3,49.8,Belo Horizonte,149.39999999999998
+2025-01-14,Calça,Masculino,7,54.21,São Paulo,379.47
+2025-02-19,Vestido,Feminino,5,159.36,São Paulo,796.8000000000001
+2025-01-09,Camiseta,Masculino,5,135.0,Curitiba,675.0
+2025-01-26,Camiseta,Infantil,7,47.09,Belo Horizonte,329.63
+2025-01-02,Camiseta,Infantil,9,44.2,Rio de Janeiro,397.8
+2025-01-20,Camiseta,Masculino,5,149.06,Curitiba,745.3
+2025-01-28,Jaqueta,Masculino,1,42.27,São Paulo,42.27
+2025-02-16,Camiseta,Infantil,1,169.62,São Paulo,169.62
+2025-01-07,Vestido,Infantil,2,149.96,Belo Horizonte,299.92
+2025-02-13,Short,Feminino,6,43.73,São Paulo,262.38
+2025-01-08,Camiseta,Infantil,9,44.32,Rio de Janeiro,398.88
+2025-02-16,Jaqueta,Feminino,8,197.63,Belo Horizonte,1581.04
+2025-02-04,Jaqueta,Feminino,5,93.53,São Paulo,467.65
+2025-01-14,Camiseta,Feminino,1,92.91,Belo Horizonte,92.91
+2025-01-17,Short,Feminino,7,168.08,São Paulo,1176.5600000000002
+2025-02-05,Camiseta,Feminino,5,190.93,São Paulo,954.6500000000001
+2025-02-19,Jaqueta,Masculino,6,197.52,São Paulo,1185.1200000000001
+2025-02-09,Calça,Infantil,7,157.97,Rio de Janeiro,1105.79
+2025-01-04,Vestido,Feminino,3,93.86,Rio de Janeiro,281.58
+2025-01-02,Jaqueta,Infantil,3,44.1,Belo Horizonte,132.3
+2025-01-06,Camiseta,Infantil,5,162.01,São Paulo,810.05
+2025-02-11,Vestido,Feminino,6,124.83,São Paulo,748.98
+2025-01-04,Camiseta,Masculino,9,102.02,Rio de Janeiro,918.18
+2025-01-29,Camiseta,Feminino,5,183.98,São Paulo,919.9
+2025-01-18,Calça,Masculino,1,48.8,Rio de Janeiro,48.8
+2025-01-26,Vestido,Infantil,4,113.65,São Paulo,454.6
+2025-02-13,Vestido,Masculino,5,31.83,Belo Horizonte,159.14999999999998
+2025-02-03,Calça,Masculino,5,109.57,São Paulo,547.8499999999999
+2025-01-10,Jaqueta,Masculino,7,39.47,São Paulo,276.28999999999996
+2025-02-05,Camiseta,Infantil,4,50.1,Curitiba,200.4
+2025-01-14,Short,Infantil,1,49.88,Rio de Janeiro,49.88
+2025-01-31,Camiseta,Masculino,5,140.27,São Paulo,701.35
+2025-02-17,Camiseta,Masculino,7,156.73,São Paulo,1097.11
+2025-01-15,Jaqueta,Feminino,6,129.07,Curitiba,774.42
+2025-01-08,Camiseta,Masculino,5,193.47,Curitiba,967.35
+2025-01-14,Calça,Feminino,4,93.63,Rio de Janeiro,374.52
+2025-01-23,Calça,Masculino,2,78.47,Curitiba,156.94
+2025-02-09,Vestido,Feminino,4,177.56,Belo Horizonte,710.24
+2025-01-21,Short,Infantil,3,67.91,Curitiba,203.73
+2025-01-16,Camiseta,Masculino,1,193.65,Belo Horizonte,193.65
+2025-02-14,Camiseta,Masculino,8,31.97,Rio de Janeiro,255.76
+2025-01-18,Jaqueta,Masculino,5,194.78,Rio de Janeiro,973.9
+2025-02-16,Calça,Masculino,4,37.24,Rio de Janeiro,148.96
+2025-01-24,Short,Feminino,8,181.39,Rio de Janeiro,1451.12
+2025-01-26,Vestido,Masculino,7,119.61,Rio de Janeiro,837.27
+2025-01-25,Calça,Infantil,2,198.7,Belo Horizonte,397.4
+2025-02-14,Vestido,Infantil,1,42.45,Belo Horizonte,42.45
+2025-02-10,Jaqueta,Masculino,4,124.06,Rio de Janeiro,496.24
+2025-01-29,Jaqueta,Infantil,8,194.68,Curitiba,1557.44
+2025-01-15,Camiseta,Masculino,2,118.83,São Paulo,237.66
+2025-02-14,Short,Masculino,3,136.9,Rio de Janeiro,410.70000000000005
+2025-01-01,Vestido,Infantil,1,148.18,Curitiba,148.18
+2025-01-25,Calça,Masculino,1,107.17,São Paulo,107.17
+2025-01-07,Jaqueta,Infantil,3,136.58,Rio de Janeiro,409.74
+2025-01-09,Camiseta,Feminino,5,129.23,Rio de Janeiro,646.15
+2025-01-24,Camiseta,Masculino,3,183.1,Belo Horizonte,549.3
+2025-01-01,Vestido,Feminino,1,37.63,São Paulo,37.63
+2025-02-13,Jaqueta,Infantil,1,77.66,São Paulo,77.66
+2025-01-08,Short,Feminino,8,191.47,Curitiba,1531.76
+2025-01-24,Jaqueta,Feminino,2,181.24,Belo Horizonte,362.48
+2025-01-11,Vestido,Infantil,3,107.36,Belo Horizonte,322.08
+2025-01-17,Vestido,Feminino,2,135.32,Belo Horizonte,270.64
+2025-01-08,Jaqueta,Feminino,3,77.05,Belo Horizonte,231.14999999999998
+2025-02-04,Vestido,Infantil,7,61.88,São Paulo,433.16
+2025-02-04,Jaqueta,Feminino,1,108.73,São Paulo,108.73
+2025-02-02,Calça,Infantil,8,89.97,Rio de Janeiro,719.76
+2025-01-05,Jaqueta,Feminino,2,129.12,Rio de Janeiro,258.24
+2025-02-11,Jaqueta,Infantil,3,43.11,Belo Horizonte,129.32999999999998
+2025-02-08,Vestido,Infantil,9,195.55,Belo Horizonte,1759.95
+2025-02-10,Vestido,Feminino,7,197.56,Belo Horizonte,1382.92
+2025-01-28,Camiseta,Feminino,4,148.59,Rio de Janeiro,594.36
+2025-01-07,Camiseta,Feminino,5,121.04,Curitiba,605.2
+2025-01-09,Calça,Masculino,2,82.52,Curitiba,165.04
+2025-01-08,Camiseta,Masculino,8,168.25,Rio de Janeiro,1346.0

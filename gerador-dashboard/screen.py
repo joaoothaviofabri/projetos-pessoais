@@ -2,45 +2,140 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.express as px
-from plotly.graph_objects import Figure
 import requests
-import time
+from time import sleep
+from plotly.graph_objects import Figure
+
+# Configuração da Página
+st.set_page_config(
+    page_title="Gerador de Gráficos",
+    page_icon="📊",
+    layout="wide",
+)
+
+
+def require_login():
+    if "usuario" not in st.session_state:
+        st.switch_page("pages/login.py")
 
 def formatar_nome(col):
     return col.lower().replace(" ", "_")
 
+def formatar_label(col):
+    return col.replace("_", " ").title()
+
+
+def converter_data(df: pd.DataFrame, col: str) -> pd.DataFrame:
+    """Tentar converter coluna para datetime sem quebrar o app."""
+    df_copy = df.copy()
+
+    if not pd.api.types.is_datetime64_any_dtype(df_copy[col]):
+        try:
+            df_copy[col] = pd.to_datetime(df_copy[col], errors="raise")
+        except Exception:
+            pass
+
+    return df_copy
+
+
 def criar_grafico(df: pd.DataFrame, x: str, y: str, tipo: str) -> Figure:
-    df=df.groupby(x).mean()
+    df_plot = df.copy()
 
+    # Tentar converter para datas
+    df_plot = converter_data(df_plot, x)
 
+    x_is_datatime = pd.api.types.is_datetime64_any_dtype(df_plot[x])
+    x_is_cat = df_plot[x].dtype == "object" or df_plot[x].nunique() < 30
+    y_is_num = pd.api.types.is_numeric_dtype(df_plot[y])
+
+    # Se for datetime vs numérico
+    if x_is_datatime and y_is_num:
+        df_plot = (
+            df_plot
+            .groupby(x, as_index=False)[y]
+            .mean()
+            .sort_values(x)
+        )
+        df_plot[x] = pd.to_datetime(df_plot[x])
+
+    # Se for categórico vs numérico -> agrega
+    elif x_is_cat and y_is_num:
+        df_plot = (
+            df_plot
+            .groupby(x, as_index=False)[y]
+            .mean()
+            .sort_values(y, ascending=False)
+        )
+
+    # Criação do Gráfico
     if tipo == "Barra":
-        fig = px.bar(df, x=x, y=y)
+        fig = px.bar(
+            df_plot,
+            x=x,
+            y=y,
+            text_auto=".2f",
+        )
 
     elif tipo == "Linha":
-        fig = px.line(df, x=x, y=y)
+        fig = px.line(
+            df_plot,
+            x=x,
+            y=y,
+            markers=True,
+        )
 
     elif tipo == "Dispersão":
-        fig = px.scatter(df, x=x, y=y)
+        fig = px.scatter(
+            df_plot,
+            x=x,
+            y=y,
+        )
 
     else:
-        fig = px.bar(df, x=x, y=y)
+        fig = px.bar(df_plot, x=x, y=y)
 
+    # Melhorias Visuais
     fig.update_layout(
-        template="plotly_dark",
-        height=500,
-        margin=dict(l=20, r=20, t=40, b=20)
+        height=520,
+        margin=dict(l=20, r=20, t=50, b=20),
+        hovermode="x unified",
+        xaxis_title=formatar_label(x),
+        yaxis_title=formatar_label(y),
+    )
+
+    # Hover
+    fig.update_traces(
+        hovertemplate="<b>%{x}</b><br>%{y:.2f}<extra></extra>"
     )
 
     return fig
 
-st.set_page_config(
-    page_title="Gerador de Gráficos",
-    page_icon="📊",
-    layout="wide"
-)
+# Requisição
+require_login()
 
 st.title("📊 Gerador Inteligente de Gráficos")
 st.caption("Carregue um arquivo e explore os dados visualmente")
+
+# Botões de interação (Logado)
+with st.sidebar.popover("Conta"):
+    st.title(f"Olá, {st.session_state['usuario']['nome']}")
+    st.write(f"📧 {st.session_state['usuario']['email']}")
+
+    col_sair, col_senha = st.columns(2)
+
+    with col_sair:
+        sair = st.button("Sair")
+        if sair:
+            st.session_state.clear()
+            with st.success("Saindo..."):
+                sleep(0.85)
+                st.switch_page("pages/login.py")
+
+    with col_senha:
+        redefinir_senha = st.button("Redefinir minha Senha")
+
+        if redefinir_senha:
+            st.switch_page("pages/redefinir_senha.py")
 
 # Prevenção de bug antes do clique
 if 'coluna_x' not in st.session_state:
@@ -86,34 +181,34 @@ if user_file_upload:
 
     st.session_state['df'] = df
 
-    # Arrumando as colunas do dataframe
-    colunas_formatadas = {
-        col: col.replace("_", " ").title()
+    # Formatando e capitalizando as colunas do dataframe
+    formatacao_coluna = {
+        formatar_label(col): col
         for col in df.columns
     }
+    st.session_state["formatacao_coluna"] = formatacao_coluna
 
 # Flag de carregamento
 if 'df_carregado' not in st.session_state:
     st.session_state['df_carregado'] = False
 
-# Botão de gerar gráfico
+# Carregamento do DF e conexão com n8n
 if user_file_upload:
     with st.container(border=True):
         st.subheader("📁 Carregar dados")
 
         with st.spinner("Processando dados"):
-            if st.button("Carregar DataFrame") and not st.session_state.get("ai_processando"):
-                st.session_state["ia_processando"] = True
+            if st.button("Carregar Dados") and not st.session_state.get("ai_processando"):
+                st.session_state["ai_processando"] = True
 
                 # Conversão do DataFrame para arquivo "CSV" e "bytes" para ser enviado para o n8n
                 csv_bytes = df.to_csv(index=False).encode('utf-8')
 
                 # Enviando o arquivo e fazendo conexão com n8n
                 try:
-                    # Salvando o retorno do n8n
                     for tentativa in range(3):
                         response = requests.post(
-                            "http://localhost:5678/webhook-test/webhook-analisar-dataframe",
+                            "http://localhost:5678/webhook/webhook-analisar-dataframe",
                             files={
                                 'file': ('dados.csv', csv_bytes, 'text/csv')
                             },
@@ -122,14 +217,19 @@ if user_file_upload:
 
                         if response.status_code == 200:
                             break
-                        time.sleep(2)
+                        sleep(2)
 
+                    # Salvando o retorno do n8n
                     dados = response.json()
                     coluna_x = dados[0]['output']['x_candidates']
                     coluna_y = dados[0]['output']['y_candidates']
 
-                    st.session_state['coluna_x'] = [formatar_nome(c) for c in coluna_x]
-                    st.session_state['coluna_y'] = [formatar_nome(c) for c in coluna_y]
+                    st.session_state['coluna_x'] = [
+                        formatar_label(formatar_nome(c)) for c in coluna_x
+                    ]
+                    st.session_state['coluna_y'] = [
+                        formatar_label(formatar_nome(c)) for c in coluna_y
+                    ]
                     st.session_state['df_carregado'] = True
 
                 except Exception as e:
@@ -164,8 +264,9 @@ if user_file_upload:
         eixo_x_label = st.selectbox("Selecione o valor para o eixo X:", options=colunas_formatadas_x, key="select_x")
         eixo_y_label = st.selectbox("Selecione o valor para o eixo Y:", options=colunas_formatadas_y, key="select_y")
 
-        eixo_x = eixo_x_label
-        eixo_y = eixo_y_label
+        coluna = st.session_state["formatacao_coluna"]
+        x_coluna = coluna[eixo_x_label]
+        y_coluna = coluna[eixo_y_label]
 
         colunas_numericas = df.select_dtypes(include="number").columns.tolist()
         colunas_categoricas = df.select_dtypes(exclude="number").columns.tolist()
@@ -179,14 +280,13 @@ if user_file_upload:
         if gerar_grafico:
             fig = criar_grafico(
                 df,
-                eixo_x_label,
-                eixo_y_label,
+                x_coluna,
+                y_coluna,
                 tipo_grafico
             )
 
             st.plotly_chart(fig, use_container_width=True)
 
-
 if 'df' in st.session_state:
     with st.expander("👀 Visualizar dados"):
-        st.dataframe(st.session_state['df'].head(), use_container_width=True)
+        st.dataframe(st.session_state['df'].head(20), use_container_width=True)
