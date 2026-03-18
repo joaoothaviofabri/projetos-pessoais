@@ -15,7 +15,3 @@ connection_url = (
 )
 
 engine = create_engine(connection_url)
-
-query = "SELECT * FROM usuario"
-
-df = pd.read_sql_query(query, engine)

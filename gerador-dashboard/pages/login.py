@@ -66,7 +66,6 @@ if st.session_state.get("recuperar_senha"):
         else:
             st.error("Esse email não foi encontrado!")
 if enviar:
-
     with engine.connect() as conn:
         result = conn.execute(
             text("SELECT nome, senha FROM usuario WHERE email = :email LIMIT 1"),

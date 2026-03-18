@@ -2,8 +2,13 @@ import streamlit as st
 import bcrypt
 from time import sleep
 from sqlalchemy import text
-from database.connection import engine
 from screen import require_login
+from database.connection import engine
+from pydantic import BaseModel, Field, ValidationError
+
+class Senha(BaseModel):
+    nova_senha: str = Field(min_length=8)
+    confirmar_senha: str = Field(min_length=8)
 
 st.title("Redefinier Senha")
 
@@ -18,47 +23,62 @@ nova_senha = st.text_input("Nova Senha", type="password", placeholder="Digite su
 confirmar_senha = st.text_input("Confirme sua senha", type="password", placeholder="Confirme sua senha")
 
 if st.button("Redefinir senha"):
-
-    email = st.session_state["usuario"]["email"]
-
-    with engine.connect() as conn:
-        result = conn.execute(
-            text("SELECT senha FROM usuario WHERE email = :email"),
-            {"email": email}
-        ).fetchone()
-
-    senha_hash = result[0]
-
-    if not bcrypt.checkpw(senha_atual.encode(), senha_hash.encode()):
-        st.error("Senha atual incorreta.")
-        st.stop()
-
-    if nova_senha != confirmar_senha:
-        st.error("As senhas não coincidem.")
-        st.stop()
-
-    nova_senha = bcrypt.hashpw(
-        nova_senha.encode(),
-        bcrypt.gensalt()
-    ).decode()
-
-    with engine.connect() as conn:
-        conn.execute(
-            text("""
-            UPDATE usuario 
-            SET senha = :senha
-            WHERE email = :email
-
-            """),
-            {
-                "senha": nova_senha,
-                "email": email
-            }
+    try:
+        senha = Senha(
+            nova_senha=nova_senha,
+            confirmar_senha=confirmar_senha
         )
-        conn.commit()
 
-    with st.spinner("Carregando..."):
-        st.success("Senha redefinida com sucesso.")
-        sleep(0.6)
-        st.session_state.clear()
-        st.rerun()
+        email = st.session_state["usuario"]["email"]
+
+        with engine.connect() as conn:
+            result = conn.execute(
+                text("SELECT senha FROM usuario WHERE email = :email"),
+                {"email": email}
+            ).fetchone()
+
+        senha_hash = result[0]
+
+        if not bcrypt.checkpw(senha_atual.encode(), senha_hash.encode()):
+            st.error("Senha atual incorreta.")
+            st.stop()
+
+        if nova_senha != confirmar_senha:
+            st.error("As senhas não coincidem.")
+            st.stop()
+
+        nova_senha = bcrypt.hashpw(
+            nova_senha.encode(),
+            bcrypt.gensalt()
+        ).decode()
+
+        with engine.connect() as conn:
+            conn.execute(
+                text("""
+                UPDATE usuario 
+                SET senha = :senha
+                WHERE email = :email
+
+                """),
+                {
+                    "senha": nova_senha,
+                    "email": email
+                }
+            )
+            conn.commit()
+
+        with st.spinner("Carregando..."):
+            st.success("Senha redefinida com sucesso.")
+            sleep(0.6)
+            st.session_state.clear()
+            st.rerun()
+
+    except ValidationError as e:
+        erro = e.errors()[0]
+        campo = erro["loc"][0]
+
+        mensagem = {
+        "nova_senha": "Senha precisa ter pelo menos 8 caracteres"
+        }
+
+        st.error(mensagem.get(campo, erro["msg"]))
