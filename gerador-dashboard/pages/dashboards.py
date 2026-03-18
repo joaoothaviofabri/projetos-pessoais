@@ -9,6 +9,7 @@ from sqlalchemy import text
 
 # If Login
 require_login()
+
 email = st.session_state["usuario"]["email"]
 
 st.title("Meus Dashboards")
@@ -55,7 +56,6 @@ if st.button("Salvar Dashboard"):
         conn.commit()
         st.success("Dashboard salvo com sucesso!")
 
-
 with engine.connect() as conn:
     result = conn.execute(
         text("SELECT id FROM usuario WHERE email = :email"),
@@ -77,17 +77,45 @@ with engine.connect() as conn:
         st.subheader(row[1])
 
         config_json = row[2]
+
         if isinstance(config_json, str):
-            config = json.loads(config_json)
+            config_loop = json.loads(config_json)
         else:
-            config = config_json
+            config_loop = config_json
 
-        if st.button("Abrir", key=row[0]):
-            st.session_state["dashboard_atual"] = config
+        if st.button("Abrir", key=f"abrir_{row[0]}"):
+            st.session_state["dashboard_id"] = row[0]
+            st.rerun()
 
-    if "dashboard_atual" in st.session_state:
-        config = st.session_state["dashboard_atual"]
-        st.write(config)
+        if st.session_state.get("dashboard_id") == row[0]:
+
+            df = pd.DataFrame({
+            "idade": [20, 30, 40],
+            "salario": [2000, 3000, 4000]
+            })
+
+            with engine.connect() as conn:
+                result_config = conn.execute(
+                    text("SELECT configuracao FROM dashboard WHERE id = :id"),
+                    {"id": row[0]}
+                ).fetchone()
+
+            config_json = result_config[0]
+
+            if isinstance(config_json, str):
+                config = json.loads(config_json)
+            else:
+                config = config_json
+
+            st.write("ID Selecionado:", row[0])
+            st.write("Config usada:", config)
+
+            fig = px.bar(df, x=config["coluna_x"], y=config["coluna_y"])
+            st.plotly_chart(fig)
+
+        if st.button("Fechar", key=f"fechar_{row[0]}"):
+            st.session_state["dashboard_id"] = None
+            st.rerun()
 
     if not result:
         st.info("Você ainda não tem dashboards salvos!")
