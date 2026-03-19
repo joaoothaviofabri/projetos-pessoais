@@ -2,8 +2,11 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import requests
+import json
 from time import sleep
+from sqlalchemy import text
 from plotly.graph_objects import Figure
+from database.connection import engine
 
 # Configuração da Página
 st.set_page_config(
@@ -273,10 +276,12 @@ if user_file_upload:
         tipo_grafico = st.selectbox("Selecione um tipo de Gráfico", options=lista_grafico)
         gerar_grafico = st.button("Gerar gráfico", use_container_width=True)
 
+    #Gerar Gráfico
     with col_grafico:
         st.subheader("📈 Visualização")
 
         if gerar_grafico:
+
             fig = criar_grafico(
                 df,
                 x_coluna,
@@ -285,6 +290,63 @@ if user_file_upload:
             )
 
             st.plotly_chart(fig, use_container_width=True)
+
+            st.session_state["config_grafico"] = {
+                "x": x_coluna,
+                "y": y_coluna,
+                "tipo_grafico": tipo_grafico,
+                "dados": df.to_dict()
+            }
+
+            st.session_state["grafico_gerado"] = True
+
+    #Salvar Dashboard
+    with col_controles:
+        if st.session_state.get("grafico_gerado"):
+            if st.button("Salvar Dashboard", use_container_width=True):
+                st.session_state["salvar_dashboard_nome_input"] = True
+
+            if "limpar_input" not in st.session_state:
+                st.session_state["limpar_input"] = False
+
+            if st.session_state.get("salvar_dashboard_nome_input"):
+                nome_dashboard = st.text_input("Nome do Dashboard", key="nome_dashboard", placeholder="Digite o nome do Dashboard")   
+
+                if st.button("Confirmar Salvar"):
+                    if "config_grafico" not in st.session_state:
+                        st.error("Nenhum gráfico foi gerado ainda.")
+                        st.stop()
+
+                    config = st.session_state["config_grafico"]
+                    config_json = json.dumps(config)
+
+                    email = st.session_state["usuario"]["email"]
+
+                    with engine.connect() as conn:
+                        result = conn.execute(
+                            text("SELECT id FROM usuario WHERE email = :email"),
+                            {"email": email}
+                        ).fetchone()
+
+                        id_usuario = result[0]  
+
+                        result = conn.execute(
+                            text("""INSERT INTO dashboard (id_usuario, nome, configuracao)
+                                VALUES (:id_usuario, :nome, :configuracao)
+                            """),
+                            {
+                                "id_usuario": id_usuario,
+                                "nome": nome_dashboard,
+                                "configuracao": config_json
+                            }
+                        )
+
+                        conn.commit()
+                        st.success("Gráfico salvo com sucesso!")
+
+                        st.session_state["limap_input"] = True
+                        st.session_state["salvar_dashboard_nome_input"] = False
+                        st.rerun()
 
 if 'df' in st.session_state:
     with st.expander("👀 Visualizar dados"):
