@@ -8,6 +8,18 @@ from screen import require_login
 from database.connection import engine
 from screen import criar_grafico
 
+# Estilização CSS
+st.markdown("""
+<style>
+    .stButton>button {
+        border-radius: 8px;
+        height: 2.8em;
+        font-weight: 600;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+
 # If Login
 require_login()
 
@@ -32,60 +44,84 @@ with engine.connect() as conn:
         {"id_usuario": id_usuario}
         ).fetchall()
 
-    for row in result:
-        st.subheader(row[1])
+    cols = st.columns(3)
+    for i, row in enumerate(result):
+        col = cols[i % 3]
 
-        config_json = row[2]
+        with col:
+            with st.container(border=True):
+                st.subheader(row[1])
 
-        if isinstance(config_json, str):
-            config_loop = json.loads(config_json)
-        else:
-            config_loop = config_json
+                config_json = row[2]
 
-        if st.button("Abrir", key=f"abrir_{row[0]}"):
-            st.session_state["dashboard_id"] = row[0]
-            st.rerun()
+                if isinstance(config_json, str):
+                    config_loop = json.loads(config_json)
+                else:
+                    config_loop = config_json
 
-        if st.session_state.get("dashboard_id") == row[0]:
+                st.caption(f"Eixo X: {config_loop['x']}")
+                st.caption(f"Eixo Y: {config_loop['y']}")
+                st.caption(f"Tipo: {config_loop['tipo_grafico']}")
 
-            if isinstance(config_json, str):
-                config = json.loads(config_json)
-            else:
-                config = config_json
+                col1, col2, col3 = st.columns(3)
 
-            config = config_loop
-            df = pd.DataFrame(config["dados"])
+                with col1:
+                    if st.button("Abrir", key=f"abrir_{row[0]}"):
+                        st.session_state["dashboard_id"] = row[0]
+                        st.rerun()
 
-            if config["tipo_grafico"] == "Barra":
-                fig = criar_grafico(
-                    df,
-                    config["x"],
-                    config["y"],
-                    config["tipo_grafico"]
-                )
+                if st.session_state.get("dashboard_id") == row[0]:
 
-                st.plotly_chart(fig)
+                    if isinstance(config_json, str):
+                        config = json.loads(config_json)
+                    else:
+                        config = config_json
 
-            elif config["tipo_grafico"] == "Linha":
-                fig = px.line(df, x=config["x"], y=config["y"])
+                    config = config_loop
+                    df = pd.DataFrame(config["dados"])
 
-            elif config["tipo_grafico"] == "Dispersão":
-                fig = px.scatter(df, x=config["x"], y=config["y"])
+                with col2:
+                    if st.button("Deletar Dashboard", key=f"exlcuir_{row[0]}"):
+                        with engine.connect() as conn:
+                            conn.execute(
+                                text("DELETE FROM dashboard WHERE id = :id"),
+                                {"id": row[0]}
+                            )
+                            conn.commit()
 
-        if st.button("Fechar", key=f"fechar_{row[0]}"):
-            st.session_state["dashboard_id"] = None
-            st.rerun()
+                        st.success("Dashboard deletado com sucesso!")
+                        st.rerun()
 
-        if st.button("Deletar Dashboard", key=f"exlcuir_{row[0]}"):
-            with engine.connect() as conn:
-                conn.execute(
-                    text("DELETE FROM dashboard WHERE id = :id"),
-                    {"id": row[0]}
-                )
-                conn.commit()
+                if "dashboard_id" in st.session_state and st.session_state["dashboard_id"]:
+                    st.divider()
+                    st.subheader("📈 Visualização do Dashboard")
 
-            st.success("Dashboard deletado com sucesso!")
-            st.rerun()
+                    dashboard_id = st.session_state["dashboard_id"] 
+
+                    dashboard = next((r for r in result if r[0] == dashboard_id), None)
+
+                    if dashboard:
+                        config_json = dashboard[2]
+
+                        if isinstance(config, str):
+                            config = json.loads(config_json)
+                        else:
+                            config = config_json
+
+                        df = pd.DataFrame(config_json["dados"])
+
+                        fig = criar_grafico(
+                            df,
+                            config["x"],
+                            config["y"],
+                            config["tipo_grafico"]
+                        )
+
+                        st.plotly_chart(fig, use_container_width=True)
+
+                        if st.button("Fechar", key=f"fechar_{row[0]}"):
+                            st.session_state["dashboard_id"] = None
+                            st.rerun()
 
     if not result:
         st.info("Você ainda não tem dashboards salvos!")
