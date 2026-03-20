@@ -15,6 +15,21 @@ st.set_page_config(
     layout="wide",
 )
 
+# Estilização CSS
+st.markdown("""
+<style>
+    .stButton>button {
+            border-radius: 10px;
+            height: 3em;
+            font-weight: bold
+    }
+
+    .stMetric {
+    text-align: center;
+    }
+}
+""", unsafe_allow_html=True)
+
 
 def require_login():
     if "usuario" not in st.session_state:
@@ -120,7 +135,7 @@ st.caption("Carregue um arquivo e explore os dados visualmente")
 
 # Botões de interação (Logado)
 with st.sidebar.popover("Conta"):
-    st.title(f"Olá, {st.session_state['usuario']['nome']}")
+    st.title(f"👤  {st.session_state['usuario']['nome']}")
     st.write(f"📧 {st.session_state['usuario']['email']}")
 
     col_sair, col_senha = st.columns(2)
@@ -156,6 +171,7 @@ with st.container(border=True):
 # Lista de Gráfico
 lista_grafico = ['Barra', 'Linha', 'Dispersão']
 
+# Leitura do Tipo do arquivo
 if user_file_upload:
     nome = user_file_upload.name.lower()
 
@@ -226,6 +242,7 @@ if user_file_upload:
                     coluna_x = dados[0]['output']['x_candidates']
                     coluna_y = dados[0]['output']['y_candidates']
 
+                    # Formatação das colunas
                     st.session_state['coluna_x'] = [
                         formatar_label(formatar_nome(c)) for c in coluna_x
                     ]
@@ -248,6 +265,7 @@ if user_file_upload:
 
     col_controles, col_grafico = st.columns([1, 2])
 
+    # Coluna de Controle
     with col_controles:
         st.subheader("⚙️ Configuração do Gráfico")
 
@@ -274,22 +292,23 @@ if user_file_upload:
         colunas_categoricas = df.select_dtypes(exclude="number").columns.tolist()
 
         tipo_grafico = st.selectbox("Selecione um tipo de Gráfico", options=lista_grafico)
-        gerar_grafico = st.button("Gerar gráfico", use_container_width=True)
+        gerar_grafico = st.button("Gerar gráfico", use_container_width=True, disabled=not st.session_state.get("df_carregado"))
 
-    #Gerar Gráfico
+    # Coluna de Geração de Gráfico
     with col_grafico:
         st.subheader("📈 Visualização")
 
         if gerar_grafico:
 
-            fig = criar_grafico(
-                df,
-                x_coluna,
-                y_coluna,
-                tipo_grafico
-            )
+            with st.spinner("Gerando gráfico..."):
+                fig = criar_grafico(
+                    df,
+                    x_coluna,
+                    y_coluna,
+                    tipo_grafico
+                )
 
-            st.plotly_chart(fig, use_container_width=True)
+                st.plotly_chart(fig, use_container_width=True)
 
             st.session_state["config_grafico"] = {
                 "x": x_coluna,
@@ -344,10 +363,11 @@ if user_file_upload:
                         conn.commit()
                         st.success("Gráfico salvo com sucesso!")
 
-                        st.session_state["limap_input"] = True
+                        st.session_state["limpar_input"] = True
                         st.session_state["salvar_dashboard_nome_input"] = False
                         st.rerun()
 
+# Visualização do DataFrame
 if 'df' in st.session_state:
     with st.expander("👀 Visualizar dados"):
         st.dataframe(st.session_state['df'].head(20), use_container_width=True)

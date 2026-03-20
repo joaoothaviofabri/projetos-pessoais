@@ -1,5 +1,4 @@
 from sqlalchemy import create_engine
-import pandas as pd
 
 DB_CONFIG = {
     "usuario": "postgres",

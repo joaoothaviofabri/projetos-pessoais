@@ -1,1 +1,1 @@
-streamlit, pandas, plotly.express, requests, time, plotly.graph_objects, pydantic==1.10.13, streamlit-pydantic, sqlalchemy, bcrypt
+streamlit, pandas, plotly.express, requests, json, time, plotly.graph_objects, pydantic==1.10.13, streamlit-pydantic, sqlalchemy, bcrypt, pydantic, secrets, datetime, smtplib, os, email.message, dotenv
