@@ -134,8 +134,9 @@ st.title("📊 Gerador Inteligente de Gráficos")
 st.caption("Carregue um arquivo e explore os dados visualmente")
 
 # Botões de interação (Logado)
-with st.sidebar.popover("Conta"):
-    st.title(f"👤  {st.session_state['usuario']['nome']}")
+with st.sidebar:
+    st.markdown("## 👤 Conta")
+    st.markdown(f"## 👤  {st.session_state['usuario']['nome']}")
     st.write(f"📧 {st.session_state['usuario']['email']}")
 
     col_sair, col_senha = st.columns(2)
@@ -152,7 +153,20 @@ with st.sidebar.popover("Conta"):
         redefinir_senha = st.button("Redefinir minha Senha")
 
         if redefinir_senha:
-            st.switch_page("pages/redefinir_senha.py")
+            st.switch_page("pages/redefinir_senha.py")          
+
+
+    st.divider()
+
+    st.markdown("## 📊 Navegação")
+ 
+    if st.button("📊 Criar Gráfico", use_container_width=True):
+        st.switch_page("screen.py")
+
+    if st.button("📁 Meus Dashboards", use_container_width=True):
+        st.switch_page("./pages/dashboards.py")
+
+
 
 # Prevenção de bug antes do clique
 if 'coluna_x' not in st.session_state:

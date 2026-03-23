@@ -19,7 +19,6 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-
 # If Login
 require_login()
 
