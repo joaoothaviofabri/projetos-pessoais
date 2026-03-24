@@ -19,10 +19,47 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+# Botões de interação (Logado)
+with st.sidebar:
+    st.markdown(f"# 👤  {st.session_state['usuario']['nome']}")
+    st.write(f"📧 {st.session_state['usuario']['email']}")
+
+    col_sair, col_senha = st.columns(2)
+
+    with col_sair:
+        sair = st.button("Sair")
+        if sair:
+            st.session_state.clear()
+            with st.success("Saindo..."):
+                sleep(0.85)
+                st.switch_page("pages/login.py")
+
+
+    with col_senha:
+        redefinir_senha = st.button("Redefinir minha Senha")
+
+        if redefinir_senha:
+            st.switch_page("pages/redefinir_senha.py")
+
+    st.divider()
+
+    st.markdown("## 📈 Navegação")
+
+    if st.button("📊 Criar Gráfico", use_container_width=True):
+        st.switch_page("screen.py")
+
+    if st.button("📁 Meus Dashboards", use_container_width=True):
+        st.switch_page("./pages/dashboards.py")
+
 # If Login
 require_login()
 
 email = st.session_state["usuario"]["email"]
+nome_dashboard = st.session_state.get("nome_dashboard", "default")
+
+if not nome_dashboard:
+    st.error("Nenhum dashboard foi selecionado.")
+    st.stop()
 
 st.title("Meus Dashboards")
 
@@ -43,9 +80,9 @@ with engine.connect() as conn:
         {"id_usuario": id_usuario}
         ).fetchall()
 
-    cols = st.columns(3)
+    cols = st.columns(2)
     for i, row in enumerate(result):
-        col = cols[i % 3]
+        col = cols[i % 2]
 
         with col:
             with st.container(border=True):
@@ -76,7 +113,6 @@ with engine.connect() as conn:
                     else:
                         config = config_json
 
-                    config = config_loop
                     df = pd.DataFrame(config["dados"])
 
                 with col2:
@@ -91,9 +127,9 @@ with engine.connect() as conn:
                         st.success("Dashboard deletado com sucesso!")
                         st.rerun()
 
-                if "dashboard_id" in st.session_state and st.session_state["dashboard_id"]:
-                    st.divider()
+                if st.session_state.get("dashboard_id") == row[0]:
                     st.subheader("📈 Visualização do Dashboard")
+                    st.divider()
 
                     dashboard_id = st.session_state["dashboard_id"] 
 
@@ -116,7 +152,7 @@ with engine.connect() as conn:
                             config["tipo_grafico"]
                         )
 
-                        st.plotly_chart(fig, use_container_width=True)
+                        st.plotly_chart(fig, use_container_width=True, key=f"grafico_{dashboard_id}")
 
                         if st.button("Fechar", key=f"fechar_{row[0]}"):
                             st.session_state["dashboard_id"] = None

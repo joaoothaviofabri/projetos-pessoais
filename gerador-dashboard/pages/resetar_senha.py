@@ -6,6 +6,22 @@ from sqlalchemy import text
 from database.connection import engine
 from pydantic import BaseModel, Field, ValidationError
 
+# Estilização CSS
+st.markdown("""
+<style>
+    .stTextInput>div>div>input {
+        border-radius: 8px;
+        padding: 10px;
+    }
+    
+    .stButton>button {
+        border-radius: 10px;
+        height: 3em;
+        font-weight: 600;
+    }
+</style>
+""", unsafe_allow_html=True)
+
 token_param = st.query_params.get("token")
 
 class Senha(BaseModel):
@@ -36,15 +52,21 @@ email = result[0]
 expira = result[1]
 
 if datetime.datetime.utcnow() > expira:
-    st.error("Token expirado!")
+    st.error("Token expirado! Solicit novamente.")
     st.stop()
 
-st.title("🔑 Redefinir senha")
+col1, col2, col3 = st.columns([1, 2, 1])
 
-nova_senha = st.text_input("Nova senha", type="password", placeholder="Digite sua nova senha")
-confirmar_nova_senha = st.text_input("Confirmar senha", type="password", placeholder="Confirme sua senha")
+with col2:
+    st.title("🔑 Redefinir senha")
+    st.caption("Crie sua nova senha")
 
-if st.button("Redefinir senha"):
+with col2, st.form("form_resetar_senha"):
+    nova_senha = st.text_input("Nova senha", type="password", key="nova_senha", placeholder="Digite sua nova senha")
+    confirmar_nova_senha = st.text_input("Confirmar senha", type="password", key="confirmar_senha", placeholder="Confirme sua senha")
+    enviar = st.form_submit_button("Resetar senha", use_container_width=True)
+
+if enviar:
     try:
         senha = Senha(
             nova_senha=nova_senha,
@@ -82,9 +104,10 @@ if st.button("Redefinir senha"):
 
                 conn.commit()
 
-            st.success("Senha redefinida com sucesso!")
-            sleep(0.6)
-            st.switch_page("pages/login.py")
+            with st.spinner("Atualizando senha..."):
+                st.success("Senha redefinida com sucesso!")
+                sleep(0.6)
+                st.switch_page("pages/login.py")
 
     except ValidationError as e:
         erro = e.errors()[0]

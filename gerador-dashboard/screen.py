@@ -135,8 +135,7 @@ st.caption("Carregue um arquivo e explore os dados visualmente")
 
 # Botões de interação (Logado)
 with st.sidebar:
-    st.markdown("## 👤 Conta")
-    st.markdown(f"## 👤  {st.session_state['usuario']['nome']}")
+    st.markdown(f"# 👤  {st.session_state['usuario']['nome']}")
     st.write(f"📧 {st.session_state['usuario']['email']}")
 
     col_sair, col_senha = st.columns(2)
@@ -149,23 +148,22 @@ with st.sidebar:
                 sleep(0.85)
                 st.switch_page("pages/login.py")
 
+
     with col_senha:
         redefinir_senha = st.button("Redefinir minha Senha")
 
         if redefinir_senha:
             st.switch_page("pages/redefinir_senha.py")          
 
-
     st.divider()
 
-    st.markdown("## 📊 Navegação")
- 
+    st.markdown("## 📈 Navegação")
+
     if st.button("📊 Criar Gráfico", use_container_width=True):
         st.switch_page("screen.py")
 
     if st.button("📁 Meus Dashboards", use_container_width=True):
         st.switch_page("./pages/dashboards.py")
-
 
 
 # Prevenção de bug antes do clique
@@ -343,7 +341,8 @@ if user_file_upload:
                 st.session_state["limpar_input"] = False
 
             if st.session_state.get("salvar_dashboard_nome_input"):
-                nome_dashboard = st.text_input("Nome do Dashboard", key="nome_dashboard", placeholder="Digite o nome do Dashboard")   
+                nome_dashboard = st.text_input("Nome do Dashboard", key="nome_dashboard", placeholder="Digite o nome do Dashboard")
+                st.session_state.nome_dashboard = nome_dashboard
 
                 if st.button("Confirmar Salvar"):
                     if "config_grafico" not in st.session_state:
@@ -374,8 +373,8 @@ if user_file_upload:
                             }
                         )
 
-                        conn.commit()
                         st.success("Gráfico salvo com sucesso!")
+                        conn.commit()
 
                         st.session_state["limpar_input"] = True
                         st.session_state["salvar_dashboard_nome_input"] = False

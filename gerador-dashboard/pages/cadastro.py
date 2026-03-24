@@ -6,6 +6,23 @@ from sqlalchemy import text
 from pydantic import BaseModel, Field, EmailStr, ValidationError
 from database.connection import engine
 
+# Estilização CSS
+st.markdown("""
+<style>
+    .stTextInput>div>div>input {
+        border-radius: 8px;
+        padding: 10px;
+    }
+
+    .stButton>button {
+        border-radius: 10px;
+        height: 3em;
+        font-weight: 600;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+
 def limpar_form():
     st.session_state["nome_usuario"] = ""
     st.session_state["email_usuario"] = ""
@@ -17,7 +34,10 @@ class Usuario(BaseModel):
     email: EmailStr
     senha: str = Field(min_length=8)
 
-st.title("Criar Conta")
+col1, col2, col3 = st.columns([1, 2, 1])
+
+with col2:
+    st.title("Criar Conta")
 
 if st.session_state.get("limpar_form"):
     st.session_state.nome_usuario = ""
@@ -25,14 +45,20 @@ if st.session_state.get("limpar_form"):
     st.session_state.senha_usuario = ""
     st.session_state["limpar_form"] = False
 
-with st.form("cadastro_usuario"):
-    nome = st.text_input('Nome:', key='nome_usuario' ,max_chars=50, placeholder='Crie seu nome de usuário')
-    email = st.text_input('Email:', key='email_usuario', max_chars=100, placeholder='Digite seu email')
-    senha = st.text_input('Senha:', key='senha_usuario', max_chars=30, type='password', placeholder='Crie sua senha')
+with col2, st.form("cadastro_usuario", border=True):
+    nome = st.text_input('Nome', key='nome_usuario' ,max_chars=50, placeholder='Crie seu nome de usuário')
+    email = st.text_input('Email', key='email_usuario', max_chars=100, placeholder='Digite seu email')
+    senha = st.text_input('Senha', key='senha_usuario', max_chars=30, type='password', placeholder='Crie sua senha')
 
-    enviar = st.form_submit_button("Cadastrar")
-    if st.form_submit_button("Possui uma conta? Logar!"):
-        st.switch_page("./pages/login.py")
+    col_btn1, col_btn2 = st.columns(2)
+
+    with col_btn1:
+        enviar = st.form_submit_button("Criar Conta", use_container_width=True)
+
+    with col_btn2:
+        login = st.form_submit_button("Já tenho uma Conta", use_container_width=True)
+        if login:
+            st.switch_page("./pages/login.py")
 
 if enviar:
     try:
@@ -69,7 +95,7 @@ if enviar:
             index=False
         )
 
-        with st.spinner("Carregando..."):
+        with st.spinner("Criando sua conta..."):
             sleep(2)
             st.success("Usuário Cadastrado!")
             sleep(0.8)

@@ -10,19 +10,24 @@ class Senha(BaseModel):
     nova_senha: str = Field(min_length=8)
     confirmar_senha: str = Field(min_length=8)
 
-st.title("Redefinier Senha")
-
 require_login()
 
 if "usuario" not in st.session_state:
     st.error("Você precisa estar logado em uma conta.")
     st.stop()
 
-senha_atual = st.text_input("Senha atual", type="password", placeholder="Digite sua senha atual")
-nova_senha = st.text_input("Nova Senha", type="password", placeholder="Digite sua nova senha")
-confirmar_senha = st.text_input("Confirme sua senha", type="password", placeholder="Confirme sua senha")
+col1, col2, col3 = st.columns([1, 2, 1])
 
-if st.button("Redefinir senha"):
+with col2:
+    st.title("Redefinier Senha")
+
+with col2, st.form("form_redefinir_senha"):
+    senha_atual = st.text_input("Senha atual", type="password", placeholder="Digite sua senha atual")
+    nova_senha = st.text_input("Nova Senha", type="password", placeholder="Digite sua nova senha")
+    confirmar_senha = st.text_input("Confirme sua senha", type="password", placeholder="Confirme sua senha")
+    enviar = st.form_submit_button("Redefinir Senha", use_container_width=True)
+
+if enviar:
     try:
         senha = Senha(
             nova_senha=nova_senha,
@@ -36,6 +41,10 @@ if st.button("Redefinir senha"):
                 text("SELECT senha FROM usuario WHERE email = :email"),
                 {"email": email}
             ).fetchone()
+
+        if result is None:
+            st.error("Usuário não encontrado.")
+            st.stop()
 
         senha_hash = result[0]
 
@@ -71,7 +80,7 @@ if st.button("Redefinir senha"):
             st.success("Senha redefinida com sucesso.")
             sleep(0.6)
             st.session_state.clear()
-            st.rerun()
+            st.switch_page("pages/login.py")
 
     except ValidationError as e:
         erro = e.errors()[0]
