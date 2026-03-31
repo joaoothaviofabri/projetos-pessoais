@@ -6,11 +6,33 @@ from screen import require_login
 from database.connection import engine
 from pydantic import BaseModel, Field, ValidationError
 
+# Estilização CSS
+st.markdown("""
+<style>
+    .stTextInput>div>div>input {
+        border-radius: 8px;
+        padding: 10px;
+    }
+    
+    .stButton>button {
+        border-radius: 10px;
+        height: 3em;
+        font-weight: 600;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+# Requisição
+if not st.session_state.get('usuario', False):
+    st.warning("Você precisa estar logado.")
+    st.stop()
+    require_login()
+
+
 class Senha(BaseModel):
     nova_senha: str = Field(min_length=8)
     confirmar_senha: str = Field(min_length=8)
 
-require_login()
 
 if "usuario" not in st.session_state:
     st.error("Você precisa estar logado em uma conta.")
@@ -26,6 +48,10 @@ with col2, st.form("form_redefinir_senha"):
     nova_senha = st.text_input("Nova Senha", type="password", placeholder="Digite sua nova senha")
     confirmar_senha = st.text_input("Confirme sua senha", type="password", placeholder="Confirme sua senha")
     enviar = st.form_submit_button("Redefinir Senha", use_container_width=True)
+    voltar = st.form_submit_button("Voltar", use_container_width=True)
+
+if voltar:
+    st.switch_page("./screen.py")
 
 if enviar:
     try:
@@ -76,18 +102,19 @@ if enviar:
             )
             conn.commit()
 
-        with st.spinner("Carregando..."):
+        with col2, st.spinner("Carregando..."):
             st.success("Senha redefinida com sucesso.")
             sleep(0.6)
             st.session_state.clear()
-            st.switch_page("pages/login.py")
+            st.switch_page("./screen.py")
 
     except ValidationError as e:
-        erro = e.errors()[0]
-        campo = erro["loc"][0]
+        with col2:
+            erro = e.errors()[0]
+            campo = erro["loc"][0]
 
-        mensagem = {
-        "nova_senha": "Senha precisa ter pelo menos 8 caracteres"
-        }
+            mensagem = {
+            "nova_senha": "Senha precisa ter pelo menos 8 caracteres"
+            }
 
-        st.error(mensagem.get(campo, erro["msg"]))
+            st.error(mensagem.get(campo, erro["msg"]))

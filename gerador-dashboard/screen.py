@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import numpy as np
 import plotly.express as px
 import requests
 import json
@@ -13,6 +14,7 @@ st.set_page_config(
     page_title="Gerador de Gráficos",
     page_icon="📊",
     layout="wide",
+    initial_sidebar_state="collapsed"
 )
 
 # Estilização CSS
@@ -21,13 +23,13 @@ st.markdown("""
     .stButton>button {
             border-radius: 10px;
             height: 3em;
-            font-weight: bold
+            font-weight: bold;
     }
 
     .stMetric {
     text-align: center;
     }
-}
+</style>
 """, unsafe_allow_html=True)
 
 
@@ -35,8 +37,10 @@ def require_login():
     if "usuario" not in st.session_state:
         st.switch_page("pages/login.py")
 
+
 def formatar_nome(col):
     return col.lower().replace(" ", "_")
+
 
 def formatar_label(col):
     return col.replace("_", " ").title()
@@ -53,6 +57,21 @@ def converter_data(df: pd.DataFrame, col: str) -> pd.DataFrame:
             pass
 
     return df_copy
+
+
+def limpar_json(obj):
+    import math
+
+    if isinstance(obj,dict):
+        return {k: limpar_json(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [limpar_json(v) for v in obj]
+    elif isinstance(obj, float):
+        if math.isnan(obj) or math.isinf(obj):
+            return None
+        return obj
+    else:
+        return obj
 
 
 def criar_grafico(df: pd.DataFrame, x: str, y: str, tipo: str) -> Figure:
@@ -127,43 +146,60 @@ def criar_grafico(df: pd.DataFrame, x: str, y: str, tipo: str) -> Figure:
 
     return fig
 
-# Requisição
-require_login()
+
+# Requisição Login
+if "usuario" not in st.session_state:
+    st.session_state.usuario = False
 
 st.title("📊 Gerador Inteligente de Gráficos")
 st.caption("Carregue um arquivo e explore os dados visualmente")
 
 # Botões de interação (Logado)
-with st.sidebar:
-    st.markdown(f"# 👤  {st.session_state['usuario']['nome']}")
-    st.write(f"📧 {st.session_state['usuario']['email']}")
+if st.session_state.usuario:
+    with st.sidebar:
+        st.markdown(f"# 👤  {st.session_state['usuario']['nome']}")
+        st.write(f"📧 {st.session_state['usuario']['email']}")
 
-    col_sair, col_senha = st.columns(2)
+        col_sair, col_senha = st.columns(2)
 
-    with col_sair:
-        sair = st.button("Sair")
-        if sair:
-            st.session_state.clear()
-            with st.success("Saindo..."):
-                sleep(0.85)
+        with col_sair:
+            sair = st.button("Sair")
+            if sair:
+                with st.success("Saindo..."):
+                    st.session_state.clear()
+                    st.rerun()
+
+        with col_senha:
+            redefinir_senha = st.button("Redefinir minha Senha")
+
+            if redefinir_senha:
+                st.switch_page("pages/redefinir_senha.py")          
+
+        st.divider()
+
+        st.markdown("## 📈 Navegação")
+
+        if st.button("📊 Criar Gráfico", use_container_width=True):
+            st.switch_page("./screen.py")
+
+        if st.button("📁 Meus Dashboards", use_container_width=True):
+            st.switch_page("./pages/dashboards.py")
+
+else:
+    with st.sidebar:
+        st.markdown("# Acesse sua Conta!")
+
+        col_login, col_cadastrar = st.columns(2)
+
+        with col_login:
+            login = st.button("Login")
+            if login:
                 st.switch_page("pages/login.py")
 
-
-    with col_senha:
-        redefinir_senha = st.button("Redefinir minha Senha")
-
-        if redefinir_senha:
-            st.switch_page("pages/redefinir_senha.py")          
-
-    st.divider()
-
-    st.markdown("## 📈 Navegação")
-
-    if st.button("📊 Criar Gráfico", use_container_width=True):
-        st.switch_page("screen.py")
-
-    if st.button("📁 Meus Dashboards", use_container_width=True):
-        st.switch_page("./pages/dashboards.py")
+        with col_cadastrar:
+            cadastrar = st.button("Cadastrar")
+            if cadastrar:
+                st.switch_page("pages/cadastro.py")
 
 
 # Prevenção de bug antes do clique
@@ -172,6 +208,9 @@ if 'coluna_x' not in st.session_state:
 if 'coluna_y' not in st.session_state:
     st.session_state['coluna_y'] = []
 
+# Lista de Gráfico
+lista_grafico = ['Barra', 'Linha', 'Dispersão']
+
 # Upload de arquivo
 with st.container(border=True):
     st.subheader("📤 Upload do arquivo")
@@ -179,9 +218,6 @@ with st.container(border=True):
         "Faça Upload do seu arquivo aqui:",
         type=["csv", "xlsx", "tsv", "ods", "parquet", "json"]
     )
-
-# Lista de Gráfico
-lista_grafico = ['Barra', 'Linha', 'Dispersão']
 
 # Leitura do Tipo do arquivo
 if user_file_upload:
@@ -341,7 +377,7 @@ if user_file_upload:
                 st.session_state["limpar_input"] = False
 
             if st.session_state.get("salvar_dashboard_nome_input"):
-                nome_dashboard = st.text_input("Nome do Dashboard", key="nome_dashboard", placeholder="Digite o nome do Dashboard")
+                nome_dashboard = st.text_input("Nome do Dashboard", key="nome_dashboard_key", placeholder="Digite o nome do Dashboard")
                 st.session_state.nome_dashboard = nome_dashboard
 
                 if st.button("Confirmar Salvar"):
@@ -350,7 +386,8 @@ if user_file_upload:
                         st.stop()
 
                     config = st.session_state["config_grafico"]
-                    config_json = json.dumps(config)
+                    config_limpo = limpar_json(config)
+                    config_json = json.dumps(config_limpo)
 
                     email = st.session_state["usuario"]["email"]
 

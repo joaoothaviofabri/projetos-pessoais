@@ -22,7 +22,6 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-
 def limpar_form():
     st.session_state["nome_usuario"] = ""
     st.session_state["email_usuario"] = ""
@@ -95,7 +94,7 @@ if enviar:
             index=False
         )
 
-        with st.spinner("Criando sua conta..."):
+        with col2, st.spinner("Criando sua conta..."):
             sleep(2)
             st.success("Usuário Cadastrado!")
             sleep(0.8)
@@ -105,15 +104,15 @@ if enviar:
         st.rerun()
 
     except ValidationError as e:
+        with col2:
+            for erro in e.errors():
+                campo = erro["loc"][0]
+                mensagem = erro["msg"]
 
-        for erro in e.errors():
-            campo = erro["loc"][0]
-            mensagem = erro["msg"]
+                mensagens = {
+                "nome": "Nome precisa ter pelo menos 3 caracteres",
+                "email": "Email inválido",
+                "senha": "Senha precisa ter pelo menos 8 caracteres"
+                }
 
-            mensagens = {
-            "nome": "Nome precisa ter pelo menos 3 caracteres",
-            "email": "Email inválido",
-            "senha": "Senha precisa ter pelo menos 8 caracteres"
-            }
-
-            st.error(mensagens.get(campo, mensagem))
+                st.error(mensagens.get(campo, mensagem))

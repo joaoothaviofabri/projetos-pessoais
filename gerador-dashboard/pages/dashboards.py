@@ -19,6 +19,12 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+# Requisição
+if not st.session_state.get('usuario', False):
+    st.warning("Você precisa estar logado.")
+    st.stop()
+    require_login()
+
 # Botões de interação (Logado)
 with st.sidebar:
     st.markdown(f"# 👤  {st.session_state['usuario']['nome']}")
@@ -51,8 +57,6 @@ with st.sidebar:
     if st.button("📁 Meus Dashboards", use_container_width=True):
         st.switch_page("./pages/dashboards.py")
 
-# If Login
-require_login()
 
 email = st.session_state["usuario"]["email"]
 nome_dashboard = st.session_state.get("nome_dashboard", "default")

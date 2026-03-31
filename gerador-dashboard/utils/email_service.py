@@ -16,14 +16,18 @@ def enviar_email(destino, link):
     msg["To"] = destino
 
     msg.set_content(f"""
-        Olá!
+Olá,
 
-        Clique no link abaixo para redefinir sua senha:
+Recebemos uma solicitação para redefinir a sua senha.
 
-        {link}
+Para continuar, clique no link abaixo:
 
-        Esse link expira em 15 minutos.
-        """)
+{link}
+
+Este link é válido por 15 minutos. Após esse período, será necessário solicitar uma nova redefinição.
+
+Se você não solicitou essa alteração, pode ignorar este email com segurança.
+""")
 
     try:
         with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:

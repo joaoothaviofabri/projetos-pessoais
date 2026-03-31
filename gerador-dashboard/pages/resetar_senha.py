@@ -3,6 +3,7 @@ import bcrypt
 import datetime
 from time import sleep
 from sqlalchemy import text
+from screen import require_login
 from database.connection import engine
 from pydantic import BaseModel, Field, ValidationError
 
@@ -21,6 +22,12 @@ st.markdown("""
     }
 </style>
 """, unsafe_allow_html=True)
+
+# Requisição
+if not st.session_state.get('usuario', False):
+    st.warning("Você precisa estar logado.")
+    st.stop()
+    require_login()
 
 token_param = st.query_params.get("token")
 
@@ -104,17 +111,18 @@ if enviar:
 
                 conn.commit()
 
-            with st.spinner("Atualizando senha..."):
+            with col2, st.spinner("Atualizando senha..."):
                 st.success("Senha redefinida com sucesso!")
                 sleep(0.6)
                 st.switch_page("pages/login.py")
 
     except ValidationError as e:
-        erro = e.errors()[0]
-        campo = erro["loc"][0]
+        with col2:
+            erro = e.errors()[0]
+            campo = erro["loc"][0]
 
-        mensagem = {
-            "nova_senha": "Senha precia ter pelo menos 8 caracteres"
-        }
+            mensagem = {
+                "nova_senha": "Senha precia ter pelo menos 8 caracteres"
+            }
 
-        st.error(mensagem.get(campo, erro["msg"]))
+            st.error(mensagem.get(campo, erro["msg"]))
