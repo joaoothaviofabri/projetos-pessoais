@@ -5,7 +5,6 @@ import datetime
 from time import sleep
 from sqlalchemy import text
 from database.connection import engine
-from utils.email_service import enviar_email
 
 # Estilização CSS
 st.markdown("""
@@ -71,7 +70,7 @@ with col2:
                     ).fetchone()
 
                 if result:
-                    st.success("Seu email foi válidado, enviaremos intruções para redefinir sua senha!")
+                    st.success("Seu email foi válidado. Um link de recuperação de senha gerado!")
 
                     token = secrets.token_urlsafe(32)
                     expira = datetime.datetime.utcnow() + datetime.timedelta(minutes=15)
@@ -90,14 +89,14 @@ with col2:
 
                             {
                                 "email": email_recuperacao,
-                                "token": token,
+                                "token": token.strip(),
                                 "expira": expira
                             }
                         )
                         conn.commit()
 
                         link = f"http://localhost:8501/resetar_senha?token={token.strip()}"
-                        enviar_email(email_recuperacao, link)
+                        st.markdown(f"[Clique aqui para redefinir sua senha]({link})")
 
                 else:
                     st.error("Esse email não foi encontrado!")
@@ -128,9 +127,9 @@ if enviar:
             }
 
             with col2, st.spinner("Entrando..."):
-                sleep(2)
+                sleep(0.1)
                 st.success("Login realizado!")
-                sleep(0.8)
+                sleep(0.1)
                 st.switch_page("screen.py")
 
         else:

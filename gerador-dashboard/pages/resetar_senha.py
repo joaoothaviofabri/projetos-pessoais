@@ -23,12 +23,6 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Requisição
-if not st.session_state.get('usuario', False):
-    st.warning("Você precisa estar logado.")
-    st.stop()
-    require_login()
-
 token_param = st.query_params.get("token")
 
 class Senha(BaseModel):
@@ -113,7 +107,7 @@ if enviar:
 
             with col2, st.spinner("Atualizando senha..."):
                 st.success("Senha redefinida com sucesso!")
-                sleep(0.6)
+                sleep(0.1)
                 st.switch_page("pages/login.py")
 
     except ValidationError as e:

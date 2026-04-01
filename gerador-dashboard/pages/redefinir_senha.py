@@ -104,7 +104,7 @@ if enviar:
 
         with col2, st.spinner("Carregando..."):
             st.success("Senha redefinida com sucesso.")
-            sleep(0.6)
+            sleep(0.1)
             st.session_state.clear()
             st.switch_page("./screen.py")
 

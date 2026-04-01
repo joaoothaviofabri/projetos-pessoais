@@ -11,7 +11,7 @@ from database.connection import engine
 
 # Configuração da Página
 st.set_page_config(
-    page_title="Gerador de Gráficos",
+    page_title="DashVerse-St",
     page_icon="📊",
     layout="wide",
     initial_sidebar_state="collapsed"
@@ -151,7 +151,7 @@ def criar_grafico(df: pd.DataFrame, x: str, y: str, tipo: str) -> Figure:
 if "usuario" not in st.session_state:
     st.session_state.usuario = False
 
-st.title("📊 Gerador Inteligente de Gráficos")
+st.title("DashVerse - Gerador de Gráficos")
 st.caption("Carregue um arquivo e explore os dados visualmente")
 
 # Botões de interação (Logado)
@@ -177,12 +177,12 @@ if st.session_state.usuario:
 
         st.divider()
 
-        st.markdown("## 📈 Navegação")
+        st.markdown("## Navegação")
 
-        if st.button("📊 Criar Gráfico", use_container_width=True):
+        if st.button("Criar Gráfico", use_container_width=True):
             st.switch_page("./screen.py")
 
-        if st.button("📁 Meus Dashboards", use_container_width=True):
+        if st.button("Meus Dashboards", use_container_width=True):
             st.switch_page("./pages/dashboards.py")
 
 else:
@@ -261,7 +261,7 @@ if 'df_carregado' not in st.session_state:
 # Carregamento do DF e conexão com n8n
 if user_file_upload:
     with st.container(border=True):
-        st.subheader("📁 Carregar dados")
+        st.subheader("Carregue seus Dados")
 
         with st.spinner("Processando dados"):
             if st.button("Carregar Dados") and not st.session_state.get("ai_processando"):
@@ -419,5 +419,5 @@ if user_file_upload:
 
 # Visualização do DataFrame
 if 'df' in st.session_state:
-    with st.expander("👀 Visualizar dados"):
+    with st.expander("Visualizar Dataframe"):
         st.dataframe(st.session_state['df'].head(20), use_container_width=True)

@@ -95,9 +95,9 @@ if enviar:
         )
 
         with col2, st.spinner("Criando sua conta..."):
-            sleep(2)
+            sleep(0.1)
             st.success("Usuário Cadastrado!")
-            sleep(0.8)
+            sleep(0.1)
 
         st.session_state["limpar_form"] = True
         st.switch_page("./pages/login.py")

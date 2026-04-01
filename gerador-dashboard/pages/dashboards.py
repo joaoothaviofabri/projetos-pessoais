@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import json
-from time import sleep
 from sqlalchemy import text
 from screen import require_login
 from database.connection import engine
@@ -26,36 +25,35 @@ if not st.session_state.get('usuario', False):
     require_login()
 
 # Botões de interação (Logado)
-with st.sidebar:
-    st.markdown(f"# 👤  {st.session_state['usuario']['nome']}")
-    st.write(f"📧 {st.session_state['usuario']['email']}")
+if st.session_state.usuario:
+    with st.sidebar:
+            st.markdown(f"# 👤  {st.session_state['usuario']['nome']}")
+            st.write(f"📧 {st.session_state['usuario']['email']}")
 
-    col_sair, col_senha = st.columns(2)
+            col_sair, col_senha = st.columns(2)
 
-    with col_sair:
-        sair = st.button("Sair")
-        if sair:
-            st.session_state.clear()
-            with st.success("Saindo..."):
-                sleep(0.85)
-                st.switch_page("pages/login.py")
+            with col_sair:
+                sair = st.button("Sair")
+                if sair:
+                    with st.success("Saindo..."):
+                        st.session_state.clear()
+                        st.rerun()
 
+            with col_senha:
+                redefinir_senha = st.button("Redefinir minha Senha")
 
-    with col_senha:
-        redefinir_senha = st.button("Redefinir minha Senha")
+                if redefinir_senha:
+                    st.switch_page("pages/redefinir_senha.py")          
 
-        if redefinir_senha:
-            st.switch_page("pages/redefinir_senha.py")
+            st.divider()
 
-    st.divider()
+            st.markdown("## Navegação")
 
-    st.markdown("## 📈 Navegação")
+            if st.button("Criar Gráfico", use_container_width=True):
+                st.switch_page("./screen.py")
 
-    if st.button("📊 Criar Gráfico", use_container_width=True):
-        st.switch_page("screen.py")
-
-    if st.button("📁 Meus Dashboards", use_container_width=True):
-        st.switch_page("./pages/dashboards.py")
+            if st.button("Meus Dashboards", use_container_width=True):
+                st.switch_page("./pages/dashboards.py")
 
 
 email = st.session_state["usuario"]["email"]
