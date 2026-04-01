@@ -64,12 +64,15 @@ def limpar_json(obj):
 
     if isinstance(obj,dict):
         return {k: limpar_json(v) for k, v in obj.items()}
+
     elif isinstance(obj, list):
         return [limpar_json(v) for v in obj]
+
     elif isinstance(obj, float):
         if math.isnan(obj) or math.isinf(obj):
             return None
         return obj
+
     else:
         return obj
 
@@ -202,14 +205,14 @@ else:
                 st.switch_page("pages/cadastro.py")
 
 
+# Lista de Gráfico
+lista_grafico = ['Barra', 'Linha', 'Dispersão']
+
 # Prevenção de bug antes do clique
 if 'coluna_x' not in st.session_state:
     st.session_state['coluna_x'] = []
 if 'coluna_y' not in st.session_state:
     st.session_state['coluna_y'] = []
-
-# Lista de Gráfico
-lista_grafico = ['Barra', 'Linha', 'Dispersão']
 
 # Upload de arquivo
 with st.container(border=True):
@@ -306,7 +309,7 @@ if user_file_upload:
     if 'df' in st.session_state:
         df_metricas = st.session_state['df']
 
-        col1, col2, col3 = st.columns(3)
+        col1, col2, col3 = st.columns(3, border=True)
         col1.metric("Linhas", df_metricas.shape[0])
         col2.metric("Colunas", df_metricas.shape[1])
         col3.metric("Valores nulos", df_metricas.isna().sum().sum())
